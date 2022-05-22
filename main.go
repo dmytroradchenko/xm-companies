@@ -1,5 +1,9 @@
 //go:generate go install github.com/google/wire/cmd/wire@latest
 //go:generate go run github.com/google/wire/cmd/wire
+//go:generate mockery --dir internal/xm-companies/store --name CompaniesRepository --output internal/xm-companies/store/mocks --case underscore
+//go:generate mockery --dir internal/xm-companies/store --name UsersRepository --output internal/xm-companies/store/mocks --case underscore
+//go:generate mockery --dir internal/xm-companies/store --name Store --output internal/xm-companies/store/mocks --case underscore
+
 package main
 
 import (

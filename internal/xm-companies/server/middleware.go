@@ -1,6 +1,22 @@
 package server
 
-import "net/http"
+import (
+	"errors"
+	"net/http"
+)
+
+var InvalidTokenError = errors.New("invalid or expired token")
+
+func (s *Server) authenticationMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token := r.Header.Get("auth-token")
+		if ok, _ := s.auth.ValidateToken(token); ok {
+			next.ServeHTTP(w, r)
+		} else {
+			s.respond(w, http.StatusUnauthorized, InvalidTokenError)
+		}
+	})
+}
 
 func (s *Server) loggerMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -51,12 +51,20 @@ func (s *Server) configureRouter() {
 		Methods(http.MethodPost)
 	s.router.Handle(
 		"/company",
-		s.loggerMiddleware(s.errorLoggerMiddleware(s.CreateOrUpdateCompany()))).
+		s.loggerMiddleware(s.authenticationMiddleware(s.errorLoggerMiddleware(s.CreateOrUpdateCompany())))).
 		Methods(http.MethodPost)
 	s.router.Handle(
 		"/company",
-		s.loggerMiddleware(s.errorLoggerMiddleware(s.DeleteCompany()))).
+		s.loggerMiddleware(s.authenticationMiddleware(s.errorLoggerMiddleware(s.DeleteCompany())))).
 		Methods(http.MethodDelete)
+	s.router.Handle(
+		"/sign-up",
+		s.loggerMiddleware(s.errorLoggerMiddleware(s.SignUp()))).
+		Methods(http.MethodPost)
+	s.router.Handle(
+		"/sign-in",
+		s.loggerMiddleware(s.errorLoggerMiddleware(s.SignIn()))).
+		Methods(http.MethodPost)
 }
 
 func (s *Server) respond(rw http.ResponseWriter, code int, data interface{}) {
