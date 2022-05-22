@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -12,6 +11,7 @@ type Config struct {
 	DbDriverName  string `env:"DB_DRIVER_NAME" env-description:"DB driver name" env-default:"postgres"`
 	DbUser        string `env:"DB_USER" env-description:"DB username"`
 	DbPassword    string `env:"DB_PASSWORD" env-description:"DB user password"`
+	DbSslMode     string `env:"DB_SSLMODE" env-description:"DB SSL Mode" env-default:"enable"`
 	Port          string `env:"PORT" env-description:"server port"`
 	TokenLifetime uint   `env:"TOKEN_LIFE_TIME" env-description:"server port" env-default:"60"`
 }
@@ -23,16 +23,4 @@ func NewConfigProvider() *Config {
 		panic("Failed to load configuration file: " + err.Error())
 	}
 	return &cfg
-}
-
-func (c Config) String() string {
-	return fmt.Sprintf(`
-DB_PORT = %s
-DB_NAME = %s
-DB_HOST = %s
-DB_DRIVER_NAME = %s
-DB_USER = %s
-DB_PASSWORD = %s
-PORT = %s
-TOKEN_LIFE_TIME = %d`, c.DbPort, c.DbName, c.DbHost, c.DbDriverName, c.DbUser, c.DbPassword, c.Port, c.TokenLifetime)
 }

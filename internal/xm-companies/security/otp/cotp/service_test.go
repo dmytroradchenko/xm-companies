@@ -1,4 +1,4 @@
-package otp
+package cotp
 
 import (
 	"fmt"
@@ -23,7 +23,7 @@ func TestService_CreateToken(t *testing.T) {
 }
 
 func TestService_ValidateToken(t *testing.T) {
-	target := NewService(&config.Config{TokenLifetime: 1})
+	target := NewServiceProvider(&config.Config{TokenLifetime: 1})
 
 	token := target.CreateToken("test")
 	if isValid, _ := target.ValidateToken(token); !isValid {
@@ -38,7 +38,7 @@ func TestService_ValidateToken(t *testing.T) {
 }
 
 func TestService_ValidityPeriod(t *testing.T) {
-	target := NewService(&config.Config{TokenLifetime: 1})
+	target := NewServiceProvider(&config.Config{TokenLifetime: 1})
 
 	if v := target.ValidityPeriod(); v != 1 {
 		t.Error(fmt.Sprintf("Expected validityPeriod is '1'. Returned: '%d'", v))

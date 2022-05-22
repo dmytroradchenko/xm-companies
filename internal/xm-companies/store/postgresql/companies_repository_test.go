@@ -22,7 +22,7 @@ func TestCompaniesRepository_Create(t *testing.T) {
 	}
 
 	mock.ExpectExec("INSERT INTO companies (.+)").
-		WithArgs("Test Company", "1234", "Ukraine", "0000", "web.site").
+		WithArgs("1234", "Test Company", "Ukraine", "0000", "web.site").
 		WillReturnResult(sqlmock.NewResult(0, 1))
 
 	if err := target.Create(context.Background(), comp); err != nil {
@@ -43,10 +43,10 @@ func TestCompaniesRepository_Update(t *testing.T) {
 		Phone:   "0000",
 		Website: "web.site",
 	}
-	query := "UPDATE companies SET code=(.+), country=(.+), phone=(.+), website=(.+) WHERE name = (.+)"
+	query := "UPDATE companies SET name=(.+), country=(.+), phone=(.+), website=(.+) WHERE code = (.+)"
 
 	mock.ExpectExec(query).
-		WithArgs("1234", "Ukraine", "0000", "web.site", "Test Company").
+		WithArgs("Test Company", "Ukraine", "0000", "web.site", "1234").
 		WillReturnResult(sqlmock.NewResult(0, 1))
 
 	if err := target.Update(context.Background(), comp); err != nil {
@@ -61,7 +61,7 @@ func TestCompaniesRepository_Delete(t *testing.T) {
 	db, mock, target := createMockedCompaniesRepository(t)
 	defer db.Close()
 
-	mock.ExpectExec("DELETE FROM companies WHERE name = (.+)").
+	mock.ExpectExec("DELETE FROM companies WHERE code = (.+)").
 		WithArgs("test").
 		WillReturnResult(sqlmock.NewResult(0, 1))
 
@@ -84,11 +84,11 @@ func TestCompaniesRepository_FindBy_Name(t *testing.T) {
 	db, mock, target := createMockedCompaniesRepository(t)
 	defer db.Close()
 
-	columns := []string{"name", "code", "country", "phone", "website"}
+	columns := []string{"code", "name", "country", "phone", "website"}
 
-	mock.ExpectQuery("SELECT (.+) FROM companies WHERE name LIKE %(.+)%").
-		WithArgs("Test").
-		WillReturnRows(sqlmock.NewRows(columns).AddRow("Test", "1234", "Ukraine", "0000", "web.site"))
+	mock.ExpectQuery("SELECT (.+) FROM companies WHERE name LIKE (.+)").
+		WithArgs("%Test%").
+		WillReturnRows(sqlmock.NewRows(columns).AddRow("1234", "Test", "Ukraine", "0000", "web.site"))
 
 	actual, err := target.FindBy(context.Background(), model.SearchFilter{Name: "Test"})
 	if err != nil {

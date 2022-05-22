@@ -1,4 +1,4 @@
-package otp
+package cotp
 
 import (
 	"time"
@@ -13,7 +13,7 @@ type Service struct {
 	keys     map[string]*otp.TokenInfo
 }
 
-func NewService(conf *config.Config) *Service {
+func NewServiceProvider(conf *config.Config) *Service {
 	return &Service{
 		lifetime: conf.TokenLifetime,
 		keys:     make(map[string]*otp.TokenInfo),

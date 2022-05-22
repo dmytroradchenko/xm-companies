@@ -20,8 +20,8 @@ CREATE TABLE users (
 );
 
 CREATE TABLE companies (
-    name text PRIMARY KEY,
-    code text,
+    code text PRIMARY KEY not null,
+    name text not null,
     country text,
     phone text,
     website text

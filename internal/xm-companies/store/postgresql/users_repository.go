@@ -22,6 +22,12 @@ const (
 
 var NoSuchUserError = errors.New("no user with such username")
 
+func NewUsersRepositoryProvider(db *sql.DB) *UsersRepository {
+	return &UsersRepository{
+		db: db,
+	}
+}
+
 func (ur *UsersRepository) Create(ctx context.Context, user *model.User) (string, error) {
 	err := sqlf.InsertInto(TableUsers).
 		Set(ColumnUsername, user.Username).
