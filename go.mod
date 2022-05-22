@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/BurntSushi/toml v1.1.0 // indirect
 	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/ilyakaznacheev/cleanenv v1.2.6 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/leporo/sqlf v1.3.0 // indirect
