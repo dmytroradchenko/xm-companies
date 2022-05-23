@@ -65,7 +65,7 @@ func TestServer_GetCompanies_ErrorWhenEmptyPayload(t *testing.T) {
 
 func TestServer_CreateOrUpdateCompany_NewUser(t *testing.T) {
 	payload := `{"name":"Test","code":"1"}`
-	req, err := http.NewRequest(http.MethodPost, "/search", strings.NewReader(payload))
+	req, err := http.NewRequest(http.MethodPost, "/company", strings.NewReader(payload))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,7 +92,7 @@ func TestServer_CreateOrUpdateCompany_NewUser(t *testing.T) {
 
 func TestServer_CreateOrUpdateCompany_UpdateUser(t *testing.T) {
 	payload := `{"name":"Test","code":"1"}`
-	req, err := http.NewRequest(http.MethodPost, "/search", strings.NewReader(payload))
+	req, err := http.NewRequest(http.MethodPost, "/company", strings.NewReader(payload))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -116,6 +116,78 @@ func TestServer_CreateOrUpdateCompany_UpdateUser(t *testing.T) {
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("handler returned incorrect status code: returned %v expected %v",
 			status, http.StatusOK)
+	}
+}
+
+func TestServer_CreateOrUpdateCompany_CodeNotSpecifiedError(t *testing.T) {
+	payload := `{"name":"Test"}`
+	req, err := http.NewRequest(http.MethodPost, "/company", strings.NewReader(payload))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s := Server{}
+
+	rr := httptest.NewRecorder()
+	handler := unwrapCustomHandler(s.CreateOrUpdateCompany(), nil, t)
+	handler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned incorrect status code: returned %v expected %v",
+			status, http.StatusBadRequest)
+	}
+	expected := "{\"message\":\"field 'code' is mandatory\"}\n"
+	if rr.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: returned %v expected %v",
+			rr.Body.String(), expected)
+	}
+}
+
+func TestServer_DeleteCompany(t *testing.T) {
+	req, err := http.NewRequest(http.MethodDelete, "/company?code=1", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	store := new(mocks.Store)
+	companies := new(mocks.CompaniesRepository)
+	store.On("Companies").Return(companies)
+	companies.On("Delete", mock.Anything, "1").Return(nil).Once()
+
+	s := Server{
+		store: store,
+	}
+
+	rr := httptest.NewRecorder()
+	handler := unwrapCustomHandler(s.DeleteCompany(), nil, t)
+	handler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned incorrect status code: returned %v expected %v",
+			status, http.StatusOK)
+	}
+}
+
+func TestServer_DeleteCompany_CodeNotSpecifiedError(t *testing.T) {
+	req, err := http.NewRequest(http.MethodDelete, "/company", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s := Server{}
+
+	rr := httptest.NewRecorder()
+	handler := unwrapCustomHandler(s.DeleteCompany(), nil, t)
+	handler.ServeHTTP(rr, req)
+
+	if status := rr.Code; status != http.StatusBadRequest {
+		t.Errorf("handler returned incorrect status code: returned %v expected %v",
+			status, http.StatusOK)
+	}
+
+	expected := "{\"message\":\"field 'code' is mandatory\"}\n"
+	if rr.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: returned %v expected %v",
+			rr.Body.String(), expected)
 	}
 }
 

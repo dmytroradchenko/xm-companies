@@ -101,6 +101,34 @@ func TestCompaniesRepository_FindBy_Name(t *testing.T) {
 	}
 }
 
+func TestCompaniesRepository_FindBy_NameAndCountry(t *testing.T) {
+	expected := &model.Company{
+		Name:    "Test",
+		Code:    "1234",
+		Country: "Ukraine",
+		Phone:   "0000",
+		Website: "web.site",
+	}
+	db, mock, target := createMockedCompaniesRepository(t)
+	defer db.Close()
+
+	columns := []string{"code", "name", "country", "phone", "website"}
+
+	mock.ExpectQuery("SELECT (.+) FROM companies WHERE name LIKE (.+) AND country LIKE (.+)").
+		WithArgs("%Test%", "%Uk%").
+		WillReturnRows(sqlmock.NewRows(columns).AddRow("1234", "Test", "Ukraine", "0000", "web.site"))
+
+	actual, err := target.FindBy(context.Background(), model.SearchFilter{Name: "Test", Country: "Uk"})
+	if err != nil {
+		t.Errorf("should return company, but returns error: %v", err)
+	} else if fmt.Sprint(expected) != fmt.Sprint(actual[0]) {
+		t.Fatalf("Expected: %v. Actual: %v", expected, actual[0])
+	}
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Error(err)
+	}
+}
+
 func createMockedCompaniesRepository(t *testing.T) (*sql.DB, sqlmock.Sqlmock, *CompaniesRepository) {
 	db, mock, err := sqlmock.New()
 	if err == nil {
